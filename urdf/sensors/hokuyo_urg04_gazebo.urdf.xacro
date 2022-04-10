@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<xacro:sensor_lidar name="hokuyo_urg04" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="hokuyo_urg04_sim">
+
+  <!-- hokuyo -->
+  <gazebo reference="${lidar_name}_laser">
+   <material>Gazebo/Grey</material>
+   <sensor type="ray" name="${lidar_name}_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>30</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>682</samples>
+            <resolution>1</resolution>
+            <min_angle>-${PI*2.0/3.0}</min_angle>
+            <max_angle> ${PI*2.0/3.0}</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.060</min>
+          <max>4.095</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise parameters based on published spec for Hokuyo laser
+               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+               reading. -->
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <update_rate>30</update_rate>
+      <plugin name="gazebo_ros_${lidar_name}_controller" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <namespace>${lidar_name}_node</namespace>
+          <argument>--ros-args</argument>
+          <argument>-r</argument>
+          <argument>~/out:=scan_raw</argument>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <min_intensity>100.0</min_intensity>
+        <frame_name>${lidar_name}_laser</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+  </xacro:macro>
+
+</xacro:sensor_lidar>

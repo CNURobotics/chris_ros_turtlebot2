@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!-- Hokoyu URG-04 lidar model (Simple) -->
+<xacro:robot name="hokuyo_urg04" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="hokuyo_urg04" params="lidar_name">
+
+  <!-- Constants for robot dimensions -->
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="mass" value="0.25" /> <!-- kg -->
+  <xacro:property name="lx"   value="0.046"  /> <!-- size of lidar base -->
+  <xacro:property name="ly"   value="0.046"  /> <!-- size of lidar base -->
+  <xacro:property name="lz"   value="0.041"  /> <!-- size of lidar base -->
+  <xacro:property name="rhoz" value="0.020"  /> <!-- size of lidar base -->
+  <xacro:property name="hz"   value="0.029"  /> <!-- size of lidar base -->
+  <xacro:property name="mz"   value="0.0205" /> <!-- size of lidar base -->
+
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/common_properties.urdf.xacro" />
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/sensors/hokuyo_urg04_gazebo.urdf.xacro" />
+
+
+  <!-- Hokuyo Laser -->
+  <link name="${lidar_name}_base_link">
+    <collision name="${lidar_name}_base_link_collision">
+      <origin xyz="0 0 ${lz/2.0}" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.041 0.041 0.060"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0.0175" rpy="0 0 0"/>
+      <geometry>
+            <mesh filename="package://chris_ros_turtlebot2/models/meshes/sensors/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="${mass}" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="${lidar_name}_laser_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${lz/2+mz}" rpy="0 0 0"/>
+    <parent link="${lidar_name}_base_link"/>
+    <child link="${lidar_name}_laser"/>
+  </joint>
+
+  <!-- Hokuyo Laser -->
+  <link name="${lidar_name}_laser">
+    <collision name="${lidar_name}_laser_collision">
+      <origin xyz="0 0 ${-(hz-mz)}" rpy="0 0 0"/>
+      <geometry>
+            <cylinder radius="${rhoz}" length="${hz}" />
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- Simulation sensors -->
+  <xacro:hokuyo_urg04_sim/>
+
+  </xacro:macro>
+</xacro:robot>

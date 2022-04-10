@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>chris_ros_turtlebot2</name>
+  <version>0.0.1</version>
+  <description>Setup to demonstrate the FlexBE-based navigation using turtlebot2 setup</description>
+  <maintainer email="robotics@cnu.edu">David Conner</maintainer>
+  <license>BSD</license>
+  <url type="bugtracker">https://github.com/FlexBE/chris_ros_turtlebot2/issues</url>
+  <url type="repository">https://github.com/FlexBE/chris_ros_turtlebot2</url>
+  <url type="website">https://github.com/FlexBE/chris_ros_turtlebot2</url>
+  <author>David Conner</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>dwb_core</depend>
+  <depend>laser_filters</depend>
+  <depend>image_flip</depend>
+  <depend>xacro</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

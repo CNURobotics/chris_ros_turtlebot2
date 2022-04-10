@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+"""
+Based on spawn_turtlebot.py
+https://zmk5.github.io/general/demo/2019/07/15/ros2-spawning-entity.html
+
+
+Script used to spawn a single URDf model in a generic position
+"""
+
+from chris_ros_turtlebot2.model_spawner import main
+if __name__ == "__main__":
+    main()
