@@ -62,6 +62,20 @@ def generate_launch_description():
         parameters=[filters]
     )
 
+    astra_cam = Node(package="astra_camera", executable="astra_camera_node")
+
+
+    image_flip = Node(package="image_flip", executable="image_flip_node",
+        output="screen", name="camera_flip",
+        remappings=[("image",         'camera/image_raw'),
+                    ('rotated_image', 'camera_rotated/image_rotated')],
+        parameters=[{'use_sim_time': use_sim_time,
+                     'rotation_steps': 2, # 2 = 180 degrees
+                     # Foxy does not have resolve_topic_name, so use parameters instead
+                     'in_image_topic_name': 'camera/image_raw',
+                     'out_image_topic_name': 'camera_rotated/image_raw'}]
+    )
+
     ## Static transform between Kobuki base and Hokuyo LiDAR
     #node = Node(package = "tf2_ros",
     #                   executable = "static_transform_publisher",
@@ -76,4 +90,7 @@ def generate_launch_description():
     launch_description.add_action(kobuki_ros_node)
     launch_description.add_action(hokuyo_node)
     launch_description.add_action(laser_filters)
+    launch_description.add_action(astra_cam)
+    launch_description.add_action(image_flip)
+
     return launch_description

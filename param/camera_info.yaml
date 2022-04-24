@@ -1,0 +1,64 @@
+#https://3dclub.orbbec3d.com/t/astra-pro-rgb-camera-calibration-file/761
+image_width: 640
+image_height: 480
+camera_name: astra_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [606.811009, 0.000000, 325.199941, 0.000000, 611.104701, 227.591593, 0.000000, 0.000000, 1.000000]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.142541, -0.248887, -0.005254, -0.005417, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [619.607422, 0.000000, 321.870740, 0.000000, 0.000000, 624.327148, 225.183125, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+
+# 2 - https://3dclub.orbbec3d.com/t/astra-pro-rgb-camera-calibration-file/761
+# image_width: 640
+# image_height: 480
+# camera_name: rgb_Astra_Orbbec
+# camera_matrix:
+# rows: 3
+# cols: 3
+# data: [585.3933817769559, 0, 315.1468411661461, 0, 585.1118292242563, 241.6570193534038, 0, 0, 1]
+# distortion_model: plumb_bob
+# distortion_coefficients:
+# rows: 1
+# cols: 5
+# data: [0.03865797395426305, 0.07468333044552319, 0.002909354535182612, -0.003725931525450735, 0]
+# rectification_matrix:
+# rows: 3
+# cols: 3
+# data: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+# projection_matrix:
+# rows: 3
+# cols: 4
+# data: [604.7041015625, 0, 313.376431985409, 0, 0, 604.9490356445312, 242.8081172994916, 0, 0, 0, 1, 0]
+#https://github.com/ros-drivers/usb_cam/blob/ros2/config/camera_info.yaml
+# image_width: 640
+# image_height: 480
+# camera_name: test_camera
+# camera_matrix:
+#   rows: 3
+#   cols: 3
+#   data: [438.783367, 0.000000, 305.593336, 0.000000, 437.302876, 243.738352, 0.000000, 0.000000, 1.000000]
+# distortion_model: plumb_bob
+# distortion_coefficients:
+#   rows: 1
+#   cols: 5
+#   data: [-0.361976, 0.110510, 0.001014, 0.000505, 0.000000]
+# rectification_matrix:
+#   rows: 3
+#   cols: 3
+#   data: [0.999978, 0.002789, -0.006046, -0.002816, 0.999986, -0.004401, 0.006034, 0.004417, 0.999972]
+# projection_matrix:
+#   rows: 3
+#   cols: 4
+#   data: [393.653800, 0.000000, 322.797939, 0.000000, 0.000000, 393.653800, 241.090902, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
