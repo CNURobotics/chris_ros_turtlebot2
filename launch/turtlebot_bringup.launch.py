@@ -48,7 +48,6 @@ def generate_launch_description():
 
     # Configure Hokuyo LiDAR node
     param_file_path = OpaqueFunction(function=configure_hokuyo)
-    launch_description.add_action(param_file_path)
 
     hokuyo_node = Node(package='urg_node', executable='urg_node_driver', output='screen',
                        parameters=[LaunchConfiguration('param')],
@@ -62,19 +61,19 @@ def generate_launch_description():
         parameters=[filters]
     )
 
-    astra_cam = Node(package="astra_camera", executable="astra_camera_node")
+    #astra_cam = Node(package="astra_camera", executable="astra_camera_node")
 
 
-    image_flip = Node(package="image_flip", executable="image_flip_node",
-        output="screen", name="camera_flip",
-        remappings=[("image",         'camera/image_raw'),
-                    ('rotated_image', 'camera_rotated/image_rotated')],
-        parameters=[{'use_sim_time': use_sim_time,
-                     'rotation_steps': 2, # 2 = 180 degrees
-                     # Foxy does not have resolve_topic_name, so use parameters instead
-                     'in_image_topic_name': 'camera/image_raw',
-                     'out_image_topic_name': 'camera_rotated/image_raw'}]
-    )
+    #image_flip = Node(package="image_flip", executable="image_flip_node",
+    #    output="screen", name="camera_flip",
+    #    remappings=[("image",         'camera/image_raw'),
+    #                ('rotated_image', 'camera_rotated/image_rotated')],
+    #    parameters=[{'use_sim_time': use_sim_time,
+    #                 'rotation_steps': 2, # 2 = 180 degrees
+    #                 # Foxy does not have resolve_topic_name, so use parameters instead
+    #                 'in_image_topic_name': 'camera/image_raw',
+    #                 'out_image_topic_name': 'camera_rotated/image_raw'}]
+    #)
 
     ## Static transform between Kobuki base and Hokuyo LiDAR
     #node = Node(package = "tf2_ros",
@@ -86,11 +85,12 @@ def generate_launch_description():
         DeclareLaunchArgument('sensor_interface', default_value='serial',
             description='sensor_interface: supported: serial, ethernet')])
 
+    launch_description.add_action(param_file_path)
     launch_description.add_action(node_robot_state_publisher)
     launch_description.add_action(kobuki_ros_node)
     launch_description.add_action(hokuyo_node)
     launch_description.add_action(laser_filters)
-    launch_description.add_action(astra_cam)
-    launch_description.add_action(image_flip)
+    #launch_description.add_action(astra_cam)
+    #launch_description.add_action(image_flip)
 
     return launch_description
