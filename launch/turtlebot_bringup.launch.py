@@ -11,13 +11,6 @@ from launch_ros.actions import Node
 import xacro
 import yaml
 
-def configure_hokuyo(context):
-    urg_node_dir = get_package_share_directory('urg_node')
-    param_file = os.path.join(urg_node_dir, 'launch',
-        'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
-    if os.path.exists(param_file):
-        return [SetLaunchConfiguration('param', param_file)]
-
 def generate_launch_description():
     turtlebot_desc_dir = get_package_share_directory('chris_ros_turtlebot2')
 
@@ -47,33 +40,24 @@ def generate_launch_description():
                            remappings=[('commands/velocity', 'cmd_vel')])
 
     # Configure Hokuyo LiDAR node
-    param_file_path = OpaqueFunction(function=configure_hokuyo)
+    param_file_path = os.path.join(turtlebot_desc_dir, 'param', 'hokuyo_serial.yaml')
+    with open(param_file_path, 'r') as f:
+        hokuyo_params = yaml.safe_load(f)['urg_node']['ros__parameters']
 
     hokuyo_node = Node(package='urg_node', executable='urg_node_driver', output='screen',
-                       parameters=[LaunchConfiguration('param')],
+                       parameters=[hokuyo_params],
                        remappings=[('scan', 'hokuyo_node/scan_raw')])
 
     # Confiugre laser filter for Hokuyo LiDAR
-    filters = os.path.join(turtlebot_desc_dir, 'param', 'laser_filters.yaml')
+    filters_file = os.path.join(turtlebot_desc_dir, 'param', 'laser_filters.yaml')
+    with open(filters_file, 'r') as f:
+        filter_params = yaml.safe_load(f)['scan_to_scan_filter_chain']['ros__parameters']
+
     laser_filters = Node(package="laser_filters", executable="scan_to_scan_filter_chain",
         output="screen", name="laser_filter",
         remappings=[("scan", 'hokuyo_node/scan_raw'), ("scan_filtered", "hokuyo_node/scan")],
-        parameters=[filters]
+        parameters=[filter_params]
     )
-
-    #astra_cam = Node(package="astra_camera", executable="astra_camera_node")
-
-
-    #image_flip = Node(package="image_flip", executable="image_flip_node",
-    #    output="screen", name="camera_flip",
-    #    remappings=[("image",         'camera/image_raw'),
-    #                ('rotated_image', 'camera_rotated/image_rotated')],
-    #    parameters=[{'use_sim_time': use_sim_time,
-    #                 'rotation_steps': 2, # 2 = 180 degrees
-    #                 # Foxy does not have resolve_topic_name, so use parameters instead
-    #                 'in_image_topic_name': 'camera/image_raw',
-    #                 'out_image_topic_name': 'camera_rotated/image_raw'}]
-    #)
 
     ## Static transform between Kobuki base and Hokuyo LiDAR
     #node = Node(package = "tf2_ros",
@@ -81,16 +65,11 @@ def generate_launch_description():
     #                   arguments = ["0 0 0.3 0 0 0 base_link laser"])
 
     # Add all the nodes and then launch
-    launch_description = LaunchDescription([
-        DeclareLaunchArgument('sensor_interface', default_value='serial',
-            description='sensor_interface: supported: serial, ethernet')])
-
-    launch_description.add_action(param_file_path)
+    print("Set up launch description")
+    launch_description = LaunchDescription()
     launch_description.add_action(node_robot_state_publisher)
     launch_description.add_action(kobuki_ros_node)
     launch_description.add_action(hokuyo_node)
     launch_description.add_action(laser_filters)
-    #launch_description.add_action(astra_cam)
-    #launch_description.add_action(image_flip)
 
     return launch_description

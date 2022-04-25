@@ -19,6 +19,10 @@ def generate_launch_description():
         'param',
         'astra.yaml'
     )
+    with open(config, 'rt') as fin:
+       params = yaml.safe_load(fin)['astra_camera_node']['ros__parameters'] 
+
+    print(params) 
 
     # Astra is not updated for ROS 2
     # astra_cam = Node(package="astra_camera",
@@ -31,17 +35,16 @@ def generate_launch_description():
     astra_cam = Node(package='usb_cam',
                      executable='usb_cam_node_exe',
                      output='screen',
-                     name="usb_camera_node",
+                     name="astra_camera_node",
                      # namespace=ns,
-                     parameters=[params_path]
+                     parameters=[params]
                     )
 
     image_flip = Node(package="image_flip", executable="image_flip_node",
         output="screen", name="camera_flip",
         remappings=[("image",         'camera/image_raw'),
                     ('rotated_image', 'camera_rotated/image_rotated')],
-        parameters=[{'use_sim_time': use_sim_time,
-                     'rotation_steps': 2, # 2 = 180 degrees
+        parameters=[{'rotation_steps': 2, # 2 = 180 degrees
                      # Foxy does not have resolve_topic_name, so use parameters instead
                      'in_image_topic_name': 'camera/image_raw',
                      'out_image_topic_name': 'camera_rotated/image_raw'}]

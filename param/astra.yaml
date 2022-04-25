@@ -14,10 +14,10 @@ astra_camera_node:
     depth_mode: 13
     depth_registration: true
     depth_time_offset: 0.0
-    device_id: '#1'
+    device_id: '#6'
     ir_mode: 13
     ir_time_offset: 0.0
-    rgb_camera_info_url: ''
+    rgb_camera_info_url: '/home/tbot1/ros2_foxy/install/chris_ros_turtlebot2/share/chris_ros_turtlebot2/param/camera_info.yaml'
     rgb_preferred: true
     use_color: false
     use_depth: true
