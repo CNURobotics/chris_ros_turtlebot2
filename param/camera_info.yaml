@@ -1,7 +1,7 @@
 #https://3dclub.orbbec3d.com/t/astra-pro-rgb-camera-calibration-file/761
 image_width: 640
 image_height: 480
-camera_name: astra_camera
+camera_name: rgb_Astra_Orbbec
 camera_matrix:
   rows: 3
   cols: 3

@@ -23,6 +23,8 @@ def generate_launch_description():
         astra_params = yaml.safe_load(fin)['astra_camera']['ros__parameters']
 
     namespace = '/camera'
+
+    # Based on camera_with_cloud from openni2_camera fork by MikeFerguson
     astra_cam = launch_ros.actions.ComposableNodeContainer(
             name='container',
             namespace=namespace,
@@ -37,6 +39,20 @@ def generate_launch_description():
                     parameters=[astra_params],
                     namespace=namespace,
                 ),
+
+                # Create XYZRGB point cloud
+                launch_ros.descriptions.ComposableNode(
+                    package='depth_image_proc',
+                    plugin='depth_image_proc::PointCloudXyzrgbNode',
+                    name='points_xyzrgb',
+                    namespace=namespace,
+                    parameters=[{'queue_size': 5}],
+                    remappings=[('rgb/image_rect_color', 'image_raw'),
+                                ('rgb/camera_info', 'camera_info'),
+                                ('depth_registered/image_rect', 'depth/image_raw'),
+                                ('points', 'depth/points'), ],
+                ),
+
             ],
             output='screen',
     )

@@ -59,11 +59,6 @@ def generate_launch_description():
         parameters=[filter_params]
     )
 
-    ## Static transform between Kobuki base and Hokuyo LiDAR
-    #node = Node(package = "tf2_ros",
-    #                   executable = "static_transform_publisher",
-    #                   arguments = ["0 0 0.3 0 0 0 base_link laser"])
-
     # Add all the nodes and then launch
     print("Set up launch description")
     launch_description = LaunchDescription()

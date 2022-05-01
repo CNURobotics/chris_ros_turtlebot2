@@ -1,28 +1,34 @@
 # Example setup for astra cameras
-astra_camera_node:
+astra_camera:
   ros__parameters:
     auto_exposure: false
     auto_white_balance: false
     color_depth_synchronization: false
-    color_frame_id: camera_rgb_optical_frame
-    color_time_offset: 0.0
+    color_camera_info_url: 'package://chris_ros_turtlebot2/param/camera_info.yaml'
+    color_frame_id: 'camera_rgb_optical_frame'
+    color_topic_name: 'image_raw'
+    color_mode: 'VGA_30Hz'
+    color_time_offset: -0.033
     data_skip: 0
-    depth_camera_info_url: ''
-    depth_frame_id: camera_depth_optical_frame
-    depth_ir_offset_x: 0.0
-    depth_ir_offset_y: 0.0
-    depth_mode: 13
+    depth_camera_info_url: 'package://chris_ros_turtlebot2/param/camera_info.yaml'
+    depth_frame_id: 'camera_depth_optical_frame'
+    depth_ir_offset_x: 5.0
+    depth_ir_offset_y: 4.0
+    depth_mode: 'VGA_30Hz'
     depth_registration: true
-    depth_time_offset: 0.0
-    device_id: '#6'
-    ir_mode: 13
-    ir_time_offset: 0.0
-    rgb_camera_info_url: '/home/tbot1/ros2_foxy/install/chris_ros_turtlebot2/share/chris_ros_turtlebot2/param/camera_info.yaml'
-    rgb_preferred: true
+    depth_time_offset: -0.033
+    depth_topic_name: "depth/image"
+    device_id: '' # Use any device (assuming only one on bus)
+    enable_reconnect: true
+    exposure: 0
+    ir_frame_id: 'camera_ir_optical_frame'
+    ir_mode: 'VGA_30Hz'
+    ir_time_offset: -0.033
+    ir_topic_name: "ir/image"
     use_color: false
     use_depth: true
     use_device_time: false
     use_ir: true
     use_sim_time: false
-    z_offset_mm: 0.0
+    z_offset_mm: 0
     z_scaling: 0.0
