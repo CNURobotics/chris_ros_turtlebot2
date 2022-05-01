@@ -40,6 +40,19 @@ def generate_launch_description():
                     namespace=namespace,
                 ),
 
+                launch_ros.descriptions.ComposableNode(
+                    package='image_flip',
+                    plugin='image_flip::ImageFlipNode',
+                    name='camera_flip',
+                    remappings=[("image",         'camera/image_raw'),
+                                ('rotated_image', 'camera_rotated/image_rotated')],
+                    parameters=[{'rotation_steps': 2, # 2 = 180 degrees
+                                 # Foxy does not have resolve_topic_name, so use parameters instead
+                                 'in_image_topic_name': 'camera/image_raw',
+                                 'out_image_topic_name': 'camera_rotated/image_raw'}],
+                    namespace='',
+                ),
+
                 # Create XYZRGB point cloud
                 launch_ros.descriptions.ComposableNode(
                     package='depth_image_proc',
@@ -57,21 +70,8 @@ def generate_launch_description():
             output='screen',
     )
 
-
-    # TODO - Make this a composable nodelet as well !
-    image_flip = Node(package="image_flip", executable="image_flip_node",
-        output="screen", name="camera_flip",
-        remappings=[("image",         'camera/image_raw'),
-                    ('rotated_image', 'camera_rotated/image_rotated')],
-        parameters=[{'rotation_steps': 2, # 2 = 180 degrees
-                     # Foxy does not have resolve_topic_name, so use parameters instead
-                     'in_image_topic_name': 'camera/image_raw',
-                     'out_image_topic_name': 'camera_rotated/image_raw'}]
-    )
-
     # Add all the nodes and then launch
     launch_description = LaunchDescription()
     launch_description.add_action(astra_cam)
-    launch_description.add_action(image_flip)
 
     return launch_description
