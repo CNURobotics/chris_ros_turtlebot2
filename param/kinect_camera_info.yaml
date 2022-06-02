@@ -1,0 +1,21 @@
+# Starter values - need to calibrate
+image_width: 640
+image_height: 480
+camera_name: kinect_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [606.811009, 0.000000, 320.0, 0.000000, 611.104701, 240.0, 0.000000, 0.000000, 1.000000]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.142541, -0.248887, -0.005254, -0.005417, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [619.607422, 0.000000, 321.870740, 0.000000, 0.000000, 624.327148, 240.0, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
