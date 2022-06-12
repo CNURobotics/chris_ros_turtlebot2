@@ -8,6 +8,7 @@ from launch.actions import OpaqueFunction
 from launch.actions import SetLaunchConfiguration
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 import xacro
 import yaml
 
@@ -47,6 +48,7 @@ def generate_launch_description():
                                  # Foxy does not have resolve_topic_name, so use parameters instead
                                  'in_image_topic_name': ParameterValue('/camera/image_raw', value_type=str),
                                  'out_image_topic_name': ParameterValue('/camera_rotated/image_raw', value_type=str)
+                                }],
                     namespace='',
                 ),
             ],
