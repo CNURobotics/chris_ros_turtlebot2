@@ -76,6 +76,7 @@ def generate_launch_description():
     filters_file = os.path.join(turtlebot_desc_dir, 'param', 'laser_filters.yaml')
     with open(filters_file, 'r') as f:
         filter_params = yaml.safe_load(f)['scan_to_scan_filter_chain']['ros__parameters']
+        filter_params['use_sim_time'] = use_sim_time
 
     laser_filters = Node(package="laser_filters", executable="scan_to_scan_filter_chain",
         output="screen", name="laser_filter",

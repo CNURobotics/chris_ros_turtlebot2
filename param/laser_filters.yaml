@@ -1,5 +1,6 @@
 scan_to_scan_filter_chain:
   ros__parameters:
+    use_sim_time: False
     filter1:
       name: shadows
       type: laser_filters/ScanShadowsFilter
