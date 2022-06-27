@@ -28,9 +28,9 @@ At this current stage, some Kobuki Turtlebot2 related packages are not released 
 https://github.com/kobuki-base/kobuki_ros_interfaces.git devel
 https://github.com/stonier/ecl_tools.git                 devel
 https://github.com/stonier/sophus.git                    release/1.2.x
-https://gitlab.pcs.cnu.edu/zutell_thesis/ecl_lite.git    humble-test (Custom fork!)
-https://gitlab.pcs.cnu.edu/zutell_thesis/ecl_core.git    humble-test (Custom fork!)
-https://gitlab.pcs.cnu.edu/zutell_thesis/kobuki_ros.git  humble-test (Custom fork!)
+https://github.com/CNURobotics/ecl_lite.git              humble-test (Custom fork!)
+https://github.com/CNURobotics/ecl_core.git              humble-test (Custom fork!)
+https://github.com/CNURobotics/kobuki_ros.git            humble-test (Custom fork!)
 https://github.com/CNURobotics/openni2_camera.git        debug-astra-galactic
 </pre>
 
@@ -57,10 +57,13 @@ colcon build
 `ros2 launch chris_ros_turtlebot2 turtlebot_bringup.launch.py`
   * Starts the hardware on the Turtlebot2  
 
+`ros2 launch chris_ros_turtlebot2 astra_bringup.launch.py use_sim_time:=False`
   > NOTE: The below launch files are configured to default to use_sim_time:=True
   > For each , add the option to set use_sim_time:=False.
   > The on robot setup, has been modified to do this for you.
 
+  > NOTE: There is option for Kinect launch, but that camera is not working under Ubuntu 22.04 and ROS 2 humble
+  
 or
 
 ### Start Gazebo with the desired world model.
