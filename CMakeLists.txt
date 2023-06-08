@@ -43,6 +43,7 @@ install(FILES chris_ros_turtlebot2.config
 
 install(PROGRAMS
   scripts/model_spawner
+  scripts/fake_localization
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""
+Script used to provide fake localization using simulation ground truth topic
+"""
+import sys
+from chris_ros_turtlebot2.fake_localization import main
+if __name__ == "__main__":
+    main(args=sys.argv)
