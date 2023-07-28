@@ -25,13 +25,13 @@ This demonstration makes use of the following repositories:
 
 At this current stage, some Kobuki Turtlebot2 related packages are not released in ROS2 binary form, so we are using the following:
 <pre>
-https://github.com/kobuki-base/kobuki_ros_interfaces.git devel
+https://github.com/stonier/ecl_core.git                  devel
+https://github.com/stonier/ecl_lite.git                  devel
 https://github.com/stonier/ecl_tools.git                 devel
 https://github.com/stonier/sophus.git                    release/1.2.x
-https://github.com/CNURobotics/ecl_lite.git              humble-test (Custom fork!)
-https://github.com/CNURobotics/ecl_core.git              humble-test (Custom fork!)
-https://github.com/CNURobotics/kobuki_ros.git            humble-test (Custom fork!)
-https://github.com/CNURobotics/openni2_camera.git        debug-astra-galactic
+https://github.com/kobuki-base/kobuki_core.git           devel
+https://github.com/kobuki-base/kobuki_ros.git            devel
+https://github.com/kobuki-base/kobuki_ros_interfaces.git devel
 </pre>
 
 
@@ -62,7 +62,7 @@ colcon build
   > For each , add the option to set use_sim_time:=False.
   > The on robot setup, has been modified to do this for you.
 
-  > NOTE: There is option for Kinect launch, but that camera is not working under Ubuntu 22.04 and ROS 2 humble
+  > NOTE: There is option for Kinect launch, but that camera is not working under Ubuntu 22.04 and ROS 2 Humble
   
 or
 
