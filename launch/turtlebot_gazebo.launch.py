@@ -84,24 +84,11 @@ def generate_launch_description():
         parameters=[filter_params]
     )
 
-    image_flip = Node(package="image_flip", executable="image_flip_node",
-        output="screen", name="camera_flip",
-        #remappings=[("image",         '/camera/image_raw'),
-        #            ('rotated_image', '/camera_rotated/image_rotated')],
-        parameters=[{'use_sim_time': use_sim_time,
-                     'rotation_steps': 2, # 2 = 180 degrees
-                     # Foxy does not have resolve_topic_name, so use parameters instead
-                     'in_image_topic_name': ParameterValue('/camera/image_raw', value_type=str),
-                     'out_image_topic_name': ParameterValue('/camera_rotated/image_raw', value_type=str)
-                     }]
-    )
-
     # Add all the nodes and then launch
     launch_description = LaunchDescription([
         node_robot_state_publisher,
         model_spawner,
         laser_filters,
-        image_flip
         ])
 
     return launch_description
