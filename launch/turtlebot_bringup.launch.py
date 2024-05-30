@@ -11,12 +11,13 @@ from launch_ros.actions import Node
 import xacro
 import yaml
 
+
 def generate_launch_description():
     turtlebot_desc_dir = get_package_share_directory('chris_ros_turtlebot2')
 
     xacro_file = os.path.join(turtlebot_desc_dir,
                               'robots',
-                              'kobuki_hexagons_astra_hokuyo.urdf.xacro')
+                              'kobuki_hexagons_d435if_hokuyo.urdf.xacro')
 
     doc = xacro.parse(open(xacro_file))
     xacro.process_doc(doc)
@@ -54,10 +55,11 @@ def generate_launch_description():
         filter_params = yaml.safe_load(f)['scan_to_scan_filter_chain']['ros__parameters']
 
     laser_filters = Node(package="laser_filters", executable="scan_to_scan_filter_chain",
-        output="screen", name="laser_filter",
-        remappings=[("scan", 'hokuyo_node/scan_raw'), ("scan_filtered", "hokuyo_node/scan")],
-        parameters=[filter_params]
-    )
+                         output="screen", name="laser_filter",
+                         remappings=[("scan", 'hokuyo_node/scan_raw'),
+                                     ("scan_filtered", "hokuyo_node/scan")],
+                         parameters=[filter_params]
+                         )
 
     # Add all the nodes and then launch
     print("Set up launch description")
