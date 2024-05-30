@@ -41,20 +41,6 @@ def generate_launch_description():
                     namespace=namespace,
                 ),
 
-                launch_ros.descriptions.ComposableNode(
-                    package='image_flip',
-                    plugin='image_flip::ImageFlipNode',
-                    name='camera_flip',
-                    #remappings=[("image",         'camera/image_raw'),
-                    #            ('rotated_image', 'camera_rotated/image_rotated')],
-                    parameters=[{'rotation_steps': 2, # 2 = 180 degrees
-                                 # Foxy does not have resolve_topic_name, so use parameters instead
-                                 'in_image_topic_name': ParameterValue('/camera/image_raw', value_type=str),
-                                 'out_image_topic_name': ParameterValue('/camera_rotated/image_raw', value_type=str)
-                    }],
-                    namespace='',
-                ),
-
                 # Create XYZRGB point cloud
                 launch_ros.descriptions.ComposableNode(
                     package='depth_image_proc',
