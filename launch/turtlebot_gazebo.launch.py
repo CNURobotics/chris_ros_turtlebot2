@@ -27,12 +27,14 @@ from launch_ros.parameter_descriptions import ParameterValue
 import xacro
 import yaml
 
+
 def configure_hokuyo(context):
     urg_node_dir = get_package_share_directory('urg_node')
     param_file = os.path.join(urg_node_dir, 'launch',
         'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
     if os.path.exists(param_file):
         return [SetLaunchConfiguration('param', param_file)]
+
 
 def generate_launch_description():
 
@@ -42,7 +44,7 @@ def generate_launch_description():
                               'robots',
                               'kobuki_hexagons_astra_hokuyo.urdf.xacro')
 
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true') # Only for gazebo launch
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')  # Only for gazebo launch
     model_pose = LaunchConfiguration('model_pose', default='0.0, 0.0, 0.04')
     model_name = LaunchConfiguration('model_name', default='turtlebot')
     model_namespace = LaunchConfiguration('model_namespace', default='')
