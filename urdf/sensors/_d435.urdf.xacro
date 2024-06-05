@@ -23,8 +23,7 @@ aluminum peripherial evaluation case.
 
 <robot name="sensor_d435" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Includes -->
-  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/sensors/_materials.urdf.xacro" />
-  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/sensors/_usb_plug.urdf.xacro" />
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/_d435.gazebo.xacro" />
 
   <xacro:macro name="sensor_d435" params="parent *origin name:=camera use_nominal_extrinsics:=false add_plug:=false use_mesh:=true">
     <xacro:property name="M_PI" value="3.1415926535897931" />

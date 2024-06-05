@@ -42,7 +42,7 @@ def generate_launch_description():
 
     xacro_file = os.path.join(turtlebot_desc_dir,
                               'robots',
-                              'kobuki_hexagons_astra_hokuyo.urdf.xacro')
+                              'kobuki_hexagons_d435if_hokuyo.urdf.xacro')
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')  # Only for gazebo launch
     model_pose = LaunchConfiguration('model_pose', default='0.0, 0.0, 0.04')
@@ -52,8 +52,18 @@ def generate_launch_description():
 
     print("Launching Turtlebot2 simulation ... ")
 
-    doc = xacro.parse(open(xacro_file))
-    xacro.process_doc(doc)
+    try:
+        doc = xacro.parse(open(xacro_file))
+    except Exception as e:
+        print("failed to parse")
+        print(e.with_traceback)
+        quit()
+    try:
+        xacro.process_doc(doc)
+    except Exception as e:
+        print("failed to process")
+        print(e)
+        quit()
     params = {'robot_description': doc.toxml(),
               'use_sim_time': use_sim_time}
 
