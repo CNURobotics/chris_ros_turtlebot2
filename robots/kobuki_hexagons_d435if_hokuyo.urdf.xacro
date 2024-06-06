@@ -14,7 +14,9 @@
 
   <xacro:kobuki/>
   <xacro:stack_hexagons parent="base_link"/>
-  <xacro:sensor_d435i   parent="base_link"/>
+  <xacro:sensor_d435i   parent="base_link">
+    <origin xyz="0.095 0 0.37" rpy="0 0 0" />
+  </xacro:sensor_d435i>
 
   <joint name="hokuyo_base_joint" type="fixed">
     <axis xyz="0 0 1" />
