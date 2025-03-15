@@ -18,15 +18,13 @@ def generate_launch_description():
     cam_param_path = os.path.join(
         turtlebot_desc_dir,
         'param',
-        'astra.yaml'
+        'realsense.yaml'
     )
     with open(cam_param_path, 'rt') as fin:
-        astra_params = yaml.safe_load(fin)['astra_camera']['ros__parameters']
+        realsense_params = yaml.safe_load(fin)['kinect_camera']['ros__parameters']
 
     namespace = '/camera'
-
-    # Based on camera_with_cloud from openni2_camera fork by MikeFerguson
-    astra_cam = launch_ros.actions.ComposableNodeContainer(
+    realsense_camera = launch_ros.actions.ComposableNodeContainer(
             name='container',
             namespace=namespace,
             package='rclcpp_components',
@@ -34,32 +32,19 @@ def generate_launch_description():
             composable_node_descriptions=[
                 # Just the driver
                 launch_ros.descriptions.ComposableNode(
-                    package='openni2_camera',
-                    plugin='openni2_wrapper::OpenNI2Driver',
-                    name='astra_camera',
-                    parameters=[astra_params],
+                    package='realsense2_camera',
+                    plugin='realsense2_camera::RealSenseNodeFactory',
+                    name='realsense_camera',
+                    parameters=[realsense_params],
                     namespace=namespace,
                 ),
-
-                # Create XYZRGB point cloud
-                launch_ros.descriptions.ComposableNode(
-                    package='depth_image_proc',
-                    plugin='depth_image_proc::PointCloudXyzrgbNode',
-                    name='points_xyzrgb',
-                    namespace=namespace,
-                    parameters=[{'queue_size': 5}],
-                    remappings=[('rgb/image_rect_color', 'image_raw'),
-                                ('rgb/camera_info', 'camera_info'),
-                                ('depth_registered/image_rect', 'depth/image_raw'),
-                                ('points', 'depth/points'), ],
-                ),
-
             ],
             output='screen',
     )
 
+
     # Add all the nodes and then launch
     launch_description = LaunchDescription()
-    launch_description.add_action(astra_cam)
+    launch_description.add_action(realsense_camera)
 
     return launch_description

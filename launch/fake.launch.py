@@ -41,7 +41,8 @@ def generate_launch_description():
     lifecycle_nodes = [ms_name]
 
     remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+                  ('/tf_static', 'tf_static'),
+                  ('/ground_truth', '/tbot0/ground_truth')]
 
     return LaunchDescription([
         SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
@@ -53,6 +54,7 @@ def generate_launch_description():
              executable='fake_localization',
              name=localization_name,
              output='screen',
+             emulate_tty=True,  # https://github.com/ros2/launch/issues/188
              parameters=[],
              remappings=remappings),
 

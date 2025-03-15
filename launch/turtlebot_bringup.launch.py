@@ -17,7 +17,7 @@ def generate_launch_description():
 
     xacro_file = os.path.join(turtlebot_desc_dir,
                               'robots',
-                              'kobuki_hexagons_astra_hokuyo.urdf.xacro')
+                              'kobuki_hexagons_hokuyo.urdf.xacro')
 
     doc = xacro.parse(open(xacro_file))
     xacro.process_doc(doc)

@@ -1,19 +1,19 @@
 import math
-import numpy as np 
+import numpy as np
 
-import message_filters 
+import message_filters
 
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import TransformStamped
-from nav_msgs.msg import Odometry 
+from nav_msgs.msg import Odometry
 
 import rclpy
 from rclpy.node import Node
 
 from tf2_ros import TransformBroadcaster
-from tf2_ros import TransformException
+from tf2_ros import LookupException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 
@@ -24,11 +24,11 @@ class FakeLocalization(Node):
 
 
         self.ground_truth_sub = message_filters.Subscriber(self, Odometry, 'ground_truth')
-        self.ground_truth_cache = message_filters.Cache(self.ground_truth_sub, 10) 
+        self.ground_truth_cache = message_filters.Cache(self.ground_truth_sub, 10)
         self.ground_truth_cache.registerCallback(self.ground_truth_cb)
 
-        self._last_truth = Odometry() 
- 
+        self._last_truth = None
+
         # Declare and acquire parameters
         self.odom_frame = self.declare_parameter('odom_frame', 'odom').get_parameter_value().string_value
         self.base_frame = self.declare_parameter('base_frame', 'base_footprint').get_parameter_value().string_value
@@ -39,7 +39,7 @@ class FakeLocalization(Node):
         assert self.tolerance > self.timer_period_s, "Must have larger transform tolerance than update period!"
 
         # @todo - make this world to map transform configurable
-        self.t_mw = np.eye(4)  # Transform from world frame to map frame 
+        self.t_mw = np.eye(4)  # Transform from world frame to map frame
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -51,7 +51,7 @@ class FakeLocalization(Node):
         self.map_pose_pub = self.create_publisher(PoseWithCovarianceStamped, 'amcl_pose', 1)
 
     @staticmethod
-    def _make_transform(posn, quat): 
+    def _make_transform(posn, quat):
         """
         Given translation and orientation in normalized quaternion,
         return a 4D homogeneous transform matrix
@@ -78,7 +78,7 @@ class FakeLocalization(Node):
         t[0][3] = posn.x
         t[1][3] = posn.y
         t[2][3] = posn.z
-        t[3][3] = 1.0 
+        t[3][3] = 1.0
 
         return t
 
@@ -104,8 +104,8 @@ class FakeLocalization(Node):
         qy = (m02 - m20)/(4*qw)
         qz = (m10 - m01)/(4*qw)
 
-        return posn, Quaternion(x=qx, y=qy, z=qz, w=qw)  
-    
+        return posn, Quaternion(x=qx, y=qy, z=qz, w=qw)
+
     def ground_truth_cb(self, msg):
         # Assuming that GT is more frequent than odom
         self.get_logger().debug(f'Truth : {msg.header.stamp} {msg.pose.pose.position} {msg.pose.pose.orientation}')
@@ -119,11 +119,12 @@ class FakeLocalization(Node):
                     self.base_frame,  # to frame
                     self.odom_frame,  # from frame
                     rclpy.time.Time()) # Get the latest transform available
-        except TransformException as ex:
+        except LookupException as ex:
 
-            self.get_logger().error(
-                    f'\n\nCould not transform {self.odom_frame} to {self.base_frame}: {ex}')
-            return 
+            if self._last_truth:
+                self.get_logger().error(
+                        f'\n\nCould not transform {self.odom_frame} to {self.base_frame}:\n {type(ex)} {ex}')
+            return
 
 
         odom_time = rclpy.time.Time.from_msg(tbo.header.stamp)
@@ -131,39 +132,40 @@ class FakeLocalization(Node):
         after_truth = self.ground_truth_cache.getElemAfterTime(odom_time)
 
         if prior_truth is None:
-            self.get_logger().error( 
-                f'\n\nCould not transform {self.odom_frame} to {self.base_frame} at {tbo.header.stamp}\n {prior_truth}\n {after_truth}')
-            return 
+            self.get_logger().error(
+                f'\n\nCould not transform {self.odom_frame} to {self.base_frame} '
+                f'at {tbo.header.stamp} with odom time ={odom_time}\n prior_truth={prior_truth}\n after_truth={after_truth}')
+            return
 
         if after_truth is None:
             # This is the best that we have
-            self._last_truth = prior_truth 
+            self._last_truth = prior_truth
         else:
             dtp = odom_time - rclpy.time.Time.from_msg(prior_truth.header.stamp)
-            dta = rclpy.time.Time.from_msg(after_truth.header.stamp)  - odom_time  
+            dta = rclpy.time.Time.from_msg(after_truth.header.stamp)  - odom_time
 
             # For now, just  use the closest point in time instead of interpolating
             if dtp < dta:
-                self._last_truth = prior_truth 
+                self._last_truth = prior_truth
             else:
-                self._last_truth = after_truth 
+                self._last_truth = after_truth
 
         self.get_logger().debug(
             f'Processing ground truth transforms at {tbo.header.stamp} and {self._last_truth.header.stamp}')
-        t_bo = self._make_transform(tbo.transform.translation, tbo.transform.rotation) 
+        t_bo = self._make_transform(tbo.transform.translation, tbo.transform.rotation)
         t_wb = self._make_transform(self._last_truth.pose.pose.position, self._last_truth.pose.pose.orientation)
- 
-        t_mb = np.dot(self.t_mw, t_wb) # base in map frame 
+
+        t_mb = np.dot(self.t_mw, t_wb) # base in map frame
 
         t_mo = np.dot(t_mb, t_bo) # odom frame in map frame
 
-        trans, quat = self._get_pose(t_mo) 
+        trans, quat = self._get_pose(t_mo)
 
         # Broadcast the transform from odom to map (as AMCL convention)
         t = TransformStamped()
         t.header.stamp = (rclpy.time.Time.from_msg(tbo.header.stamp) + rclpy.time.Duration(seconds=self.tolerance)).to_msg()
         t.header.frame_id = self.global_frame
-        t.child_frame_id = self.odom_frame 
+        t.child_frame_id = self.odom_frame
 
         t.transform.translation.x = trans.x
         t.transform.translation.y = trans.y
@@ -175,20 +177,20 @@ class FakeLocalization(Node):
         t.transform.rotation.w = quat.w
         self.tf_caster.sendTransform(t)
 
-        # Robot's estimated pose in the map, with covariance. 
+        # Robot's estimated pose in the map, with covariance.
         pose = PoseWithCovarianceStamped()
-        pose.header.stamp = tbo.header.stamp 
-        pose.header.frame_id = self.global_frame 
-        pose.pose.pose.position = trans 
-        pose.pose.pose.orientation = quat 
-        self.map_pose_pub.publish(pose) 
+        pose.header.stamp = tbo.header.stamp
+        pose.header.frame_id = self.global_frame
+        pose.pose.pose.position = trans
+        pose.pose.pose.orientation = quat
+        self.map_pose_pub.publish(pose)
 
 def main(args=None):
     rclpy.init(args=args)
     node = FakeLocalization()
     try:
         node.get_logger().info(f'{node.get_name()} - begin processing transforms ...')
- 
+
         rclpy.spin(node)
         node.destroy_node()
         rclpy.shutdown()

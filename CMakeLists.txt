@@ -37,12 +37,11 @@ install(DIRECTORY robots
         DESTINATION share/${PROJECT_NAME}
 )
 
-install(FILES chris_ros_turtlebot2.config
-        DESTINATION share/${PROJECT_NAME}
-)
+# install(FILES chris_ros_turtlebot2.config
+#         DESTINATION share/${PROJECT_NAME}
+# )
 
 install(PROGRAMS
-  scripts/model_spawner
   scripts/fake_localization
   DESTINATION lib/${PROJECT_NAME}
 )

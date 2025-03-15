@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!--
+    - Base      :kobuki
+    - Stacks    :hexagons
+    - 3d Sensor :astra
+-->
+<robot name="turtlebot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:arg name="robot_name" default="tbot0"/> <!-- required for gazebo -->
+  <xacro:arg name="use_nominal_extrinsics" default="true"/> <!-- required for gazebo -->
+  <xacro:arg name="add_camera_plug" default="false" />
+  <xacro:arg name="use_camera_mesh" default="true" />
+  <xacro:arg name="lidar_type" default="gpu_lidar" /> <!-- vs. lidar -->
+  <xacro:arg name="visualize_lidar" default="true" />
+
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/turtlebot_common_library.urdf.xacro" />
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/kobuki.urdf.xacro" />
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/stacks/hexagons.urdf.xacro"/>
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/sensors/realsense_sensor.urdf.xacro"/>
+  <xacro:include filename="$(find chris_ros_turtlebot2)/urdf/sensors/hokuyo_urg04.urdf.xacro"/>
+
+  <xacro:kobuki/>
+  <xacro:stack_hexagons parent="base_link"/>
+
+  <joint name="hokuyo_base_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="-0.0254 0.0 0.208" rpy="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="hokuyo_base_link"/>
+  </joint>
+
+  <xacro:hokuyo_urg04 
+          lidar_name="hokuyo"
+          lidar_type="$(arg lidar_type)"
+          sim_gazebo="$(arg sim_gazebo)"
+          visualize_lidar="$(arg visualize_lidar)"/>
+
+  <joint name="realsense_base_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0.095 0 0.37" rpy="0 0 0" />
+    <parent link="base_footprint"/>
+    <child link="realsense_mount_link"/>
+  </joint>
+  
+  <link name="realsense_mount_link">
+    <visual>
+      <origin xyz="-0.0254 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.0254 0.0889 0.0254 "/>
+      </geometry>
+      <material name="tripod">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <inertial>
+        <mass value="0.0066" />
+        <origin xyz="0 0 0"/>
+        <inertia ixx="1.e-4" ixy="0.0" ixz="0.0"
+                  iyy="1.e-4" iyz="0.0"
+                  izz="1.e-5" />
+    </inertial>
+    <collision>
+      <origin xyz="-0.0254 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.0254 0.0889 0.0254 "/>
+      </geometry>
+    </collision>
+  </link>
+
+  <xacro:realsense_sensor parent="realsense_mount_link"
+      use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+      add_plug="$(arg add_camera_plug)"
+      use_mesh="$(arg use_camera_mesh)"
+      sim_gazebo="$(arg sim_gazebo)"/>
+
+
+
+
+  <!-- Gazebo plugins -->
+
+  <xacro:if value="$(arg sim_gazebo)">
+    <!-- Add ros2_control hardware interface configuration for Gazebo (different controller in HW) -->
+    <ros2_control name="$(arg robot_name)" type="system">
+
+      <hardware>
+          <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+
+      <joint name="wheel_left_joint">
+        <command_interface name="velocity" />
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+      <joint name="wheel_right_joint">
+        <command_interface name="velocity" />
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+     
+      <!-- Controllers -->
+      <!--controller name="diff_drive_controller" type="diff_drive_controller/DiffDriveController">
+        <param name="left_wheel" value="wheel_left_joint"/>
+        <param name="right_wheel" value="wheel_right_joint"/>
+        <param name="left_wheel_radius" value="0.033"/>
+        <param name="right_wheel_radius" value="0.03"/>
+        <param name="wheel_separation" value="0.2286"/>
+        <param name="cmd_vel_timeout" value="0.5"/>
+        <!- - Add more parameters as needed - ->
+      </controller-->
+    </ros2_control>
+    <gazebo>
+      <plugin filename="libgz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find chris_ros_turtlebot2)/param/diff_drive_controller_params.yaml</parameters>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
+
+</robot>

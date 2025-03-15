@@ -52,7 +52,7 @@
       </gazebo>
 
       <gazebo reference="cliff_sensor_left_link">
-        <sensor type="ray" name="cliff_sensor_left">
+        <sensor type="gpu_lidar" name="cliff_sensor_left">
           <always_on>true</always_on>
           <update_rate>50</update_rate>
           <visualize>true</visualize>
@@ -64,19 +64,17 @@
                 <min_angle>-0.0436</min_angle>  <!-- -2.5 degree -->
                 <max_angle>0.0436</max_angle> <!-- 2.5 degree -->
               </horizontal>
-            <!-- Cannot use vertical rays until this bug is resolved -->
-            <!-- https://bitbucket.org/osrf/gazebo/issue/509/vertical-sensor-doesnt-works -->
-            <!-- <vertical> -->
-            <!--     <samples>50</samples> -->
-            <!--     <resolution>1.0</resolution> -->
-            <!--     <min_angle>-0.0436</min_angle>  -2.5 degree -->
-            <!--     <max_angle>0.0436</max_angle> 2.5 degree -->
-            <!-- </vertical> -->
-            </scan>
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>            
+          </scan>
             <range>
               <min>0.01</min>
               <max>0.15</max>
-              <resolution>1.0</resolution>
+              <resolution>0.01</resolution>
             </range>
           </ray>
         </sensor>
@@ -95,19 +93,17 @@
                 <min_angle>-0.0436</min_angle>  <!-- -2.5 degree -->
                 <max_angle>0.0436</max_angle> <!-- 2.5 degree -->
               </horizontal>
-            <!-- Cannot use vertical rays until this bug is resolved -->
-            <!-- https://bitbucket.org/osrf/gazebo/issue/509/vertical-sensor-doesnt-works -->
-            <!-- <vertical> -->
-            <!--     <samples>50</samples> -->
-            <!--     <resolution>1.0</resolution> -->
-            <!--     <min_angle>-0.0436</min_angle>  -2.5 degree -->
-            <!--     <max_angle>0.0436</max_angle> 2.5 degree -->
-            <!-- </vertical> -->
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>            
             </scan>
             <range>
               <min>0.01</min>
               <max>0.15</max>
-              <resolution>1.0</resolution>
+              <resolution>0.01</resolution>
             </range>
           </ray>
         </sensor>
@@ -126,19 +122,17 @@
                 <min_angle>-0.0436</min_angle>  <!-- -2.5 degree -->
                 <max_angle>0.0436</max_angle> <!-- 2.5 degree -->
               </horizontal>
-            <!-- Cannot use vertical rays until this bug is resolved -->
-            <!-- https://bitbucket.org/osrf/gazebo/issue/509/vertical-sensor-doesnt-works -->
-            <!-- <vertical> -->
-            <!--     <samples>50</samples> -->
-            <!--     <resolution>1.0</resolution> -->
-            <!--     <min_angle>-0.0436</min_angle>  -2.5 degree -->
-            <!--     <max_angle>0.0436</max_angle> 2.5 degree -->
-            <!-- </vertical> -->
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>            
             </scan>
             <range>
               <min>0.01</min>
               <max>0.15</max>
-              <resolution>1.0</resolution>
+              <resolution>0.01</resolution>
             </range>
           </ray>
         </sensor>
@@ -146,21 +140,10 @@
 
       <gazebo reference="gyro_link">
        <sensor type="imu" name="imu">
-        <plugin name="gazebo_ros_imu_controller" filename="libgazebo_ros_imu_sensor.so">
-          <ros>
-            <argument>--ros-args</argument>
-            <argument>-r</argument>
-            <argument>~/out:=imu</argument>
-          </ros>
-          <output_type>sensor_msgs/msg/Imu</output_type>
-          <body_name>gyro_link</body_name>
-          <frame_name>gyro_link</frame_name>
-        </plugin>
         <always_on>true</always_on>
         <update_rate>50</update_rate>
         <visualize>false</visualize>
         <imu>
-          <!-- based on original and https://github.com/ros-simulation/gazebo_ros_pkgs/files/2298904/gazebo_ros_imu_sensor.world.txt -->
           <angular_velocity>
             <x>
               <noise type="gaussian">
@@ -168,6 +151,9 @@
                 <stddev>${0.0014*0.0014}</stddev>
                 <bias_mean>0.0000075</bias_mean>
                 <bias_stddev>0.0000008</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                <precision>0.00025</precision>
               </noise>
             </x>
             <y>
@@ -176,6 +162,9 @@
                 <stddev>${0.0014*0.0014}</stddev>
                 <bias_mean>0.0000075</bias_mean>
                 <bias_stddev>0.0000008</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                <precision>0.00025</precision>
               </noise>
             </y>
             <z>
@@ -184,6 +173,9 @@
                 <stddev>${0.0014*0.0014}</stddev>
                 <bias_mean>0.0000075</bias_mean>
                 <bias_stddev>0.0000008</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                <precision>0.00025</precision>
               </noise>
             </z>
           </angular_velocity>
@@ -202,6 +194,9 @@
                 <stddev>1.7e-2</stddev>
                 <bias_mean>0.1</bias_mean>
                 <bias_stddev>0.001</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                <precision>0.00025</precision>
               </noise>
             </y>
             <z>
@@ -210,6 +205,9 @@
                 <stddev>1.7e-2</stddev>
                 <bias_mean>0.1</bias_mean>
                 <bias_stddev>0.001</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                <precision>0.00025</precision>
               </noise>
             </z>
           </linear_acceleration>
@@ -218,6 +216,15 @@
       </gazebo>
 
       <gazebo>
+        <plugin
+          filename="gz-sim-odometry-publisher-system"
+          name="gz::sim::systems::OdometryPublisher">
+          <odom_frame>odom</odom_frame>
+          <robot_base_frame>base_footprint</robot_base_frame>
+        </plugin>
+      </gazebo>
+
+      <!--gazebo>
       <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
         <update_rate>50</update_rate>
         <left_joint>wheel_left_joint</left_joint>
@@ -227,7 +234,7 @@
         <max_wheel_torque>1.0</max_wheel_torque>
         <max_wheel_acceleration>1.0</max_wheel_acceleration>
         <command_topic>cmd_vel</command_topic>
-        <!-- output -->
+        <!- - output - ->
         <publish_odom>true</publish_odom>
         <publish_odom_tf>true</publish_odom_tf>
         <publish_wheel_tf>false</publish_wheel_tf>
@@ -236,7 +243,7 @@
         <robot_base_frame>base_footprint</robot_base_frame>
         </plugin>
 
-        <!-- publish ground truth -->
+        <!- - publish ground truth - ->
         <plugin name="p3d_ground_truth" filename="libgazebo_ros_p3d.so">
             <always_on>true</always_on>
             <update_rate>50.0</update_rate>
@@ -246,7 +253,7 @@
             <xyz_offset>0 0 0</xyz_offset>
             <rpy_offset>0 0 0</rpy_offset>
             <ros>
-              <!--https://github.com/ros-simulation/gazebo_ros_pkgs/issues/1318-->
+              <!- -https://github.com/ros-simulation/gazebo_ros_pkgs/issues/1318- ->
               <remapping>odom:=ground_truth</remapping>
             </ros>
 
@@ -261,6 +268,6 @@
         <joint_name>wheel_right_joint</joint_name>
       </plugin>
 
-      </gazebo>
+      </gazebo -->
   </xacro:macro>
 </robot>

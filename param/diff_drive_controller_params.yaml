@@ -1,0 +1,24 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    tbot0:
+      type: diff_drive_controller/DiffDriveController
+
+tbot0:
+  ros__parameters:
+    left_wheel_names: ["wheel_left_joint"]  # The left wheel joint name in your URDF
+    right_wheel_names: ["wheel_right_joint"]  # The right wheel joint name in your URDF
+    wheel_separation: 0.2286  # Distance between the two wheels in meters
+    wheel_radius: 0.033  
+    cmd_vel_timeout: 0.5      # Timeout for velocity commands
+    publish_rate: 50.  # Frequency of publishing the controller state
+    base_frame_id: "base_footprint"
+    pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    command_interfaces:
+      - velocity
+    state_interfaces:
+      - position
+      - velocity

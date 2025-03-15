@@ -11,7 +11,7 @@ This repository contains code that interfaces with the ROS 2 versions of the
 Installation and Setup
 ----------------------
 
-This package has a number of dependencies.  
+This package has a number of dependencies.
 
 We will add a number of repos to our setup and install.
 
@@ -20,7 +20,7 @@ Quickly skim this README before installing or running anything:
 This demonstration makes use of the following repositories:
 
 <pre>
-- git: {local-name: src/chris_ros_turtlebot2,     uri: 'https://github.com/CNURobotics/chris_ros_turtlebot2.git',     version: ros2-devel }
+- git: {local-name: src/chris_ros_turtlebot2,     uri: 'https://github.com/CNURobotics/chris_ros_turtlebot2.git',     version: jazzy-devel }
 </pre>
 
 At this current stage, some Kobuki Turtlebot2 related packages are not released in ROS2 binary form, so we are using the following:
@@ -31,7 +31,6 @@ https://github.com/stonier/ecl_tools.git                 devel
 https://github.com/stonier/sophus.git                    release/1.2.x
 https://github.com/kobuki-base/kobuki_core.git           devel
 https://github.com/kobuki-base/kobuki_ros.git            devel
-https://github.com/kobuki-base/kobuki_ros_interfaces.git devel
 </pre>
 
 
@@ -42,7 +41,7 @@ colcon build
 . setup.bash
 </pre>
 
-> NOTE: Anytime you build new packages, you need to re-run the setup.bash script inside the workspace root.  
+> NOTE: Anytime you build new packages, you need to re-run the setup.bash script inside the workspace root.
 > Anytime you change a Python script or launch file, you need to re-run `colcon build` from the WORKSPACE_ROOT folder, but you only need to re-source `. setup.bash` when the package information and folders change.
 
 
@@ -55,25 +54,42 @@ colcon build
   * Best to set this using a udev.rule (Google)
 
 `ros2 launch chris_ros_turtlebot2 turtlebot_bringup.launch.py`
-  * Starts the hardware on the Turtlebot2  
+  * Starts the hardware on the Turtlebot2
 
-`ros2 launch chris_ros_turtlebot2 astra_bringup.launch.py use_sim_time:=False`
+`ros2 launch chris_ros_turtlebot2 realsense_bringup.launch.py use_sim_time:=False`
   > NOTE: The below launch files are configured to default to use_sim_time:=True
-  > For each , add the option to set use_sim_time:=False.
+  > For each, add the option to set use_sim_time:=False.
   > The on robot setup, has been modified to do this for you.
 
-  > NOTE: There is option for Kinect launch, but that camera is not working under Ubuntu 22.04 and ROS 2 Humble
-  
 or
 
 ### Start Gazebo with the desired world model.
  * See `chris_world_models` repository for some available options
    * e.g. `ros2 launch chris_world_models gazebo_creech_world.launch.py`
+   * Options to launch simulated balls into the world (see `chris_world_models` for more information)
+  * Start the simulated robot
+      * `ros2 launch chris_ros_turtlebot2 turtlebot_gazebo.launch.py`
+      * Starts the simulated Kobuki Turtlebot2 in Gazebo with the CHRISLab sensor configuration
 
-   * Start the simulated robot
-       * `ros2 launch chris_ros_turtlebot2 turtlebot_gazebo.launch.py`
-       * Starts the simulated Kobuki Turtlebot2 in Gazebo with the CHRISLab sensor configuration
 
+## Quick Test
+
+```
+ros2 topic pub -r 10 /tbot0/cmd_vel geometry_msgs/msg/TwistStamped "twist:
+  linear:
+    x: 0.2
+    y: 0.0
+    z: 0.0
+  angular:
+    x: 0.0
+    y: 0.0
+    z: 0.0"
+```
+
+Reset pose to home
+```
+gz service -s /world/empty/set_pose --reqtype gz.msgs.Pose --reptype gz.msgs.Boolean --timeout 2000 --req 'name: "tbot0", position: { x: 0.0, y: 0.0, z: 0.0 }, orientation: { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }'
+```
 
 ## Optional: Explore URDF
 ---
