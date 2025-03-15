@@ -23,14 +23,15 @@ This demonstration makes use of the following repositories:
 - git: {local-name: src/chris_ros_turtlebot2,     uri: 'https://github.com/CNURobotics/chris_ros_turtlebot2.git',     version: jazzy-devel }
 </pre>
 
-At this current stage, some Kobuki Turtlebot2 related packages are not released in ROS2 binary form, so we are using the following:
+At this current stage, some Kobuki Turtlebot2 related packages are not released in ROS2 binary form, so for running on hardware, we are using the following:
 <pre>
-https://github.com/stonier/ecl_core.git                  devel
-https://github.com/stonier/ecl_lite.git                  devel
-https://github.com/stonier/ecl_tools.git                 devel
-https://github.com/stonier/sophus.git                    release/1.2.x
-https://github.com/kobuki-base/kobuki_core.git           devel
-https://github.com/kobuki-base/kobuki_ros.git            devel
+- git: {local-name: src/sophus,                   uri: 'https://github.com/CNURobotics/sophus.git',                    version: jazzy-devel}
+- git: {local-name: src/ecl_tools,                uri: 'https://github.com/CNURobotics/ecl_tools.git',                 version: jazzy-devel}
+- git: {local-name: src/ecl_lite,                 uri: 'https://github.com/CNURobotics/ecl_lite.git',                  version: jazzy-devel}
+- git: {local-name: src/ecl_core,                 uri: 'https://github.com/CNURobotics/ecl_core.git',                  version: jazzy-devel}
+- git: {local-name: src/kobuki_ros,               uri: 'https://github.com/CNURobotics/kobuki_ros.git',                version: jazzy-devel }
+- git: {local-name: src/kobuki_core,              uri: 'https://github.com/kobuki-base/kobuki_core.git',               version: devel }
+- git: {local-name: src/kobuki_ros_interfaces,    uri: 'https://github.com/kobuki-base/kobuki_ros_interfaces.git',     version: devel }
 </pre>
 
 
