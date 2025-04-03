@@ -1,4 +1,4 @@
-# Copyright 2022, CHRISLab, Christopher Newport University
+# Copyright 2022-25, CHRISLab, Christopher Newport University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 import os
 from ament_index_python.packages import get_package_share_directory
-#import xacro
 import yaml
 
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, LogInfo, RegisterEventHandler, TimerAction, SetLaunchConfiguration
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, TimerAction, SetLaunchConfiguration
 from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
@@ -29,7 +28,6 @@ from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 
@@ -115,21 +113,17 @@ def generate_launch_description():
             "/hokuyo_node/scan_raw@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
             "/hokuyo_node/scan_raw/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",
             ["/model/", tbot_name, "/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry"],
+            ["/model/", tbot_name, "/pose@geometry_msgs/msg/PoseArray[gz.msgs.Pose_V"],
        ],
        remappings=[
-           (["/model/", tbot_name, "/odometry"], [tbot_name, "/ground_truth"])
+           (["/model/", tbot_name, "/odometry"], [tbot_name, "/odom"]),
+           (["/model/", tbot_name, "/pose"], [tbot_name, "/ground_truth"]),
+           ('/camera/depth/image', '/camera/image_raw'),
+           ('/camera/depth/camera_info', '/camera/camera_info'),
+
        ],
         output="screen",
     )
-
-    # gazebo = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [PathJoinSubstitution([FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'])]
-    #     ),
-    #     launch_arguments=[("gz_args", ["-r ", PathJoinSubstitution(
-    #         [FindPackageShare(turtlebot_pkg), "robots", "chrislab.sdf"]
-    #     )])],
-    # )
 
     spawn_entity = Node(
         package="ros_gz_sim",
@@ -230,16 +224,6 @@ def generate_launch_description():
         parameters=[filter_params]
     )
 
-    relay_odom = Node(
-        name="relay_odom",
-        package="topic_tools",
-        executable="relay",
-        arguments=[PathJoinSubstitution(["/", tbot_name, "odom"]),
-                   "/odom",
-        ],
-        output="screen",
-    )
-
     relay_cmd_vel = Node(
         name="relay_cmd_vel",
         package="topic_tools",
@@ -254,11 +238,9 @@ def generate_launch_description():
         declared_arguments +
         [   robot_state_pub_node,
             rviz_node,
-            # gazebo,
             spawn_entity,
             gz_bridge_node,
             laser_filters,
-            relay_odom,
             relay_cmd_vel,
             delay_joint_state_broadcaster_spawner_after_ros2_control_node,
         ]

@@ -1,4 +1,4 @@
-# Copyright 2022 CHRISLab, Christopher Newport University
+# Copyright 2022-25 CHRISLab, Christopher Newport University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ def generate_launch_description():
              name=localization_name,
              output='screen',
              emulate_tty=True,  # https://github.com/ros2/launch/issues/188
-             parameters=[],
+             parameters=[{'use_sim_time': use_sim_time,
+                          }],
              remappings=remappings),
 
         Node(package='nav2_map_server',

@@ -1,13 +1,28 @@
-import math
+# Copyright 2022-25 CHRISLab, Christopher Newport University
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Author: David Conner
+
 import numpy as np
 
-import message_filters
+from message_filters import Cache
 
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import TransformStamped
-from nav_msgs.msg import Odometry
+from geometry_msgs.msg import PoseArray
 
 import rclpy
 from rclpy.node import Node
@@ -17,16 +32,35 @@ from tf2_ros import LookupException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 
+
+class GroundTruthCache(Cache):
+    """Cache that fixes header timestamp on messages lacking it."""
+
+    def __init__(self, cache_size, clock):
+        self.clock = clock
+        super().__init__(None, cache_size)  # Now this sees your overridden connectInput
+
+    def connectInput(self, f):
+        pass
+
+    def update_stamp(self, msg):
+        msg.header.stamp = self.clock.now().to_msg()
+        self.add(msg)
+
+
 class FakeLocalization(Node):
 
     def __init__(self):
-        super().__init__('fake_localization')
+        super().__init__('fake_localization', automatically_declare_parameters_from_overrides=True)
 
-
-        self.ground_truth_sub = message_filters.Subscriber(self, Odometry, 'ground_truth')
-        self.ground_truth_cache = message_filters.Cache(self.ground_truth_sub, 10)
-        self.ground_truth_cache.registerCallback(self.ground_truth_cb)
-
+        # The gzbridge does not set the header time stamp, so we will manually manage the message filter cache
+        self.ground_truth_cache = GroundTruthCache(20, self.get_clock())
+        self._ground_truth_sub = self.create_subscription(
+            PoseArray,
+            'ground_truth',
+            self.ground_truth_cache.update_stamp,
+            10
+        )
         self._last_truth = None
 
         # Declare and acquire parameters
@@ -49,6 +83,10 @@ class FakeLocalization(Node):
 
         # Create turtle2 velocity publisher
         self.map_pose_pub = self.create_publisher(PoseWithCovarianceStamped, 'amcl_pose', 1)
+
+        use_sim_time = self.get_parameter('use_sim_time').get_parameter_value().bool_value
+        print(f"use_sim_time: {use_sim_time}")
+        self.get_logger().info(f"Current time: {self.get_clock().now().to_msg()}")
 
     @staticmethod
     def _make_transform(posn, quat):
@@ -106,10 +144,6 @@ class FakeLocalization(Node):
 
         return posn, Quaternion(x=qx, y=qy, z=qz, w=qw)
 
-    def ground_truth_cb(self, msg):
-        # Assuming that GT is more frequent than odom
-        self.get_logger().debug(f'Truth : {msg.header.stamp} {msg.pose.pose.position} {msg.pose.pose.orientation}')
-
 
     def update_cb(self):
 
@@ -134,7 +168,10 @@ class FakeLocalization(Node):
         if prior_truth is None:
             self.get_logger().error(
                 f'\n\nCould not transform {self.odom_frame} to {self.base_frame} '
-                f'at {tbo.header.stamp} with odom time ={odom_time}\n prior_truth={prior_truth}\n after_truth={after_truth}')
+                f'at {tbo.header.stamp} with odom time ={odom_time}\n prior_truth={prior_truth}\n after_truth={after_truth}\n'
+                f"use_sim_time: {self.get_parameter('use_sim_time').get_parameter_value().bool_value}"
+                f"Clock type: {'ROS_TIME (sim)' if self.get_clock().clock_type == rclpy.clock.ClockType.ROS_TIME else 'SYSTEM_TIME'}")
+
             return
 
         if after_truth is None:
@@ -150,10 +187,8 @@ class FakeLocalization(Node):
             else:
                 self._last_truth = after_truth
 
-        self.get_logger().debug(
-            f'Processing ground truth transforms at {tbo.header.stamp} and {self._last_truth.header.stamp}')
         t_bo = self._make_transform(tbo.transform.translation, tbo.transform.rotation)
-        t_wb = self._make_transform(self._last_truth.pose.pose.position, self._last_truth.pose.pose.orientation)
+        t_wb = self._make_transform(self._last_truth.poses[0].position, self._last_truth.poses[0].orientation)
 
         t_mb = np.dot(self.t_mw, t_wb) # base in map frame
 
